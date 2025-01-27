@@ -1,6 +1,6 @@
 import unittest
-
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from textnode import TextNode, TextType
+from htmlnode import HTMLNode, LeafNode, ParentNode, text_node_to_html_node
 
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html_none(self):
@@ -57,3 +57,11 @@ class TestParentNode(unittest.TestCase):
         inner_node = ParentNode("div", [LeafNode("p", "Inner text")])
         outer_node = ParentNode("section", [inner_node])
         self.assertEqual(outer_node.to_html(), '<section><div><p>Inner text</p></div></section>')
+
+class TestTextNodeToHtml(unittest.TestCase):
+    def test_base_case(self):
+        text_node = TextNode(text="Hello", text_type=TextType.BOLD)
+        leaf_node = text_node_to_html_node(text_node)
+        self.assertEqual(leaf_node.tag, "b")
+        self.assertEqual(leaf_node.value, "Hello")
+        self.assertEqual(leaf_node.props, {})
