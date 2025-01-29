@@ -1,6 +1,8 @@
 import unittest
 from textnode import *
-from htmlnode import *
+from html_node import *
+from extract_markdown import *
+from inline_markdown import split_nodes_delimiter
 
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html_none(self):
