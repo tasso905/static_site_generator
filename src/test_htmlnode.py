@@ -193,3 +193,67 @@ class TestInlineMarkdown(unittest.TestCase):
         self.assertEqual(final_nodes[3].text, "link")
         self.assertEqual(final_nodes[3].url, "url")
         self.assertEqual(final_nodes[3].text_type, TextType.LINK)
+
+class TestMarkdownBlocks(unittest.TestCase):
+    def test_markdown_to_blocks(self):
+        test_md = """# This is a heading
+
+    This is a paragraph.
+
+    * List item 1
+    * List item 2"""
+        
+        expected = [
+            "# This is a heading",
+            "This is a paragraph.",
+            "* List item 1\n* List item 2"
+        ]
+        result = markdown_to_blocks(test_md)
+        self.assertEqual(result, expected)
+
+
+class TestBlockToBlock(unittest.TestCase):
+    def test_block_heading(self):
+        expected = "heading"
+        result= block_to_block_type("# Valid heading")
+        self.assertEqual(result, expected)
+    
+    def test_block_paragraph(self):
+        expected="paragraph"
+        result = block_to_block_type("#Invalid heading")
+        result_2 = block_to_block_type("####### Too many")
+        result_3 = block_to_block_type("```not closed")
+        result_4 = block_to_block_type("1. First\n3. Third")
+        self.assertEqual(result, expected)
+        self.assertEqual(result_2, expected)
+        self.assertEqual(result_3, expected)
+        self.assertEqual(result_4, expected)
+
+    def test_block_code(self):
+        expected = "code"
+        result= block_to_block_type("```\nsome code\n```")
+        self.assertEqual(result, expected)
+
+    def test_block_ordered(self):
+        expected = "ordered_list"
+        result= block_to_block_type("1. First\n2. Second")
+        self.assertEqual(result, expected)
+    
+    def test_block_quote(self):
+        expected = "quote"
+        result = block_to_block_type("> First line\n> Second line")
+        self.assertEqual(result, expected)
+    
+    def test_block_unordered(self):
+        expected = "unordered_list"
+        result = block_to_block_type("* First item\n* Second item")
+        result2 = block_to_block_type("- First item\n- Second item")
+        self.assertEqual(result, expected)
+        self.assertEqual(result2, expected)
+    
+    def test_multiple_heading_levels(self):
+        expected = "heading"
+        result = block_to_block_type("# H1")
+        result2 = block_to_block_type("###### H6")
+        self.assertEqual(result, expected)
+        self.assertEqual(result2, expected)
