@@ -1,8 +1,5 @@
 from textnode import *
 
-@property
-def text(self):
-    return self.value
 
 class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
@@ -28,6 +25,9 @@ class LeafNode(HTMLNode):
         self.props = props or {}  
         super().__init__(tag, value, props=self.props)
         self.children = None
+    @property
+    def text(self):
+        return self.value
     def to_html(self):
         if self.value is None:
             raise ValueError("a LeafNode must have a value!")
