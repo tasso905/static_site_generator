@@ -1,5 +1,7 @@
 import unittest
 from extract_markdown import *
+from inline_markdown import *
+from split_nodes import *
 
 class TestExtractMarkdownImages(unittest.TestCase):
 

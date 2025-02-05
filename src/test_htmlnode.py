@@ -2,7 +2,7 @@ import unittest
 from textnode import *
 from html_node import *
 from extract_markdown import *
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import *
 from split_nodes import *
 
 class TestHTMLNode(unittest.TestCase):
