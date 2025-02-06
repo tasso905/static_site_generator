@@ -54,13 +54,16 @@ def text_to_textnodes(text):
     return nodes
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    #print(f"Processing delimiter: {delimiter}")
     new_nodes = []
     for old_node in old_nodes:
+        #print(f"Node text: {old_node.text}")
         if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
         split_nodes = []
         sections = old_node.text.split(delimiter)
+        #print(f"Sections after split: {sections}")
         if len(sections) % 2 == 0:
             raise ValueError("Invalid markdown, formatted section not closed")
         for i in range(len(sections)):

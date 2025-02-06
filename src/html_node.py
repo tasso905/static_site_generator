@@ -8,7 +8,18 @@ class HTMLNode():
         self.children = children
         self.props = props
     def to_html(self):
-        raise NotImplementedError()
+        if self.tag is None:
+            return self.value or ""
+        
+        props_html = self.props_to_html()
+        
+        if isinstance(self.children, list):
+            children_html = ""
+            for child in self.children:
+                children_html += child.to_html()
+            return f"<{self.tag}{props_html}>{children_html}</{self.tag}>"
+        else:
+            return f"<{self.tag}{props_html}>{self.value or ''}</{self.tag}>"
     def props_to_html(self):
         format_string = []
         if self.props is None:
@@ -48,7 +59,8 @@ class ParentNode(HTMLNode):
             raise ValueError("a ParentNode must have children")
         if self.tag == None:
             raise ValueError("a ParentNode must have a tag value")
-        html = f"<{self.tag}>"
+        props_html = self.props_to_html()
+        html = f"<{self.tag}{props_html}>"  # Include props here
         for child in self.children:
             html+= child.to_html()
         html += f"</{self.tag}>"  # closing tag

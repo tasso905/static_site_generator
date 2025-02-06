@@ -3,6 +3,27 @@ from html_node import HTMLNode, LeafNode, ParentNode
 from split_nodes import *
 import os
 import shutil
+from markdown_to_html_node import extract_title, markdown_to_html_node
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    print(f"Scanning directory: {dir_path_content}")  # Add this debug line
+     # First, we need to get the list of items in the directory
+    for item in os.listdir(dir_path_content):
+        # Create full paths for source and destination
+        src_path = os.path.join(dir_path_content, item)
+        dest_path = os.path.join(dest_dir_path, item)
+
+        if os.path.isfile(src_path):
+            if src_path.endswith(".md"):
+                with open(src_path, 'r') as file:
+                    markdown = file.read()
+                html_node = markdown_to_html_node(markdown)
+                dest_path = dest_path.replace('.md', '.html')
+                generate_page(src_path, template_path, dest_path)
+        else:
+            os.makedirs(dest_path, exist_ok=True)
+            generate_pages_recursive(src_path, template_path, dest_path)
 
 def copy_recursive(src_dir, dest_dir):
 
@@ -23,30 +44,39 @@ def copy_recursive(src_dir, dest_dir):
             # Recurse into the subdirectory
             copy_recursive(src_path, dest_path)
 
-def main():
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, 'r') as file:
+        content_from = file.read()
+    title = extract_title(content_from)
+    with open(template_path, 'r') as file:
+        content_template = file.read()
+    html_node = markdown_to_html_node(content_from)
+    html_content = html_node.to_html()
+    final_html = content_template.replace("{{ Title }}", title)
+    final_html = final_html.replace("{{ Content }}", html_content)
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, 'w') as file:
+        file.write(final_html)
 
-    # Define source and destination directory paths
-    src_dir = "static"
+def main():
+    # Define directory paths
     dest_dir = "public"
 
-    # Call your recursive function to copy contents
-    copy_recursive(src_dir, dest_dir)
+    # Delete and recreate public directory
+    if os.path.exists(dest_dir):
+        shutil.rmtree(dest_dir)
+    os.makedirs(dest_dir)
 
+    # Copy static files
+    copy_recursive("static", dest_dir)
 
-    text_node = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev")
-    print(text_node)
-    html_node  = HTMLNode(tag="p", value="Hello", props={"class": "greeting"})
-    print(html_node)
-    parent_node = ParentNode(tag="p", children="Hello", props={"class": "greeting"})
-    print(parent_node)
-    print(block_to_block_type("# Valid heading"))  # should return 'heading'
-    print(block_to_block_type("#Invalid heading"))  # should return 'paragraph' (no space after #)
-    print(block_to_block_type("####### Too many"))  # should return 'paragraph'
-    print(block_to_block_type("```\nsome code\n```"))  # should return 'code'
-    print(block_to_block_type("```not closed"))  # should return 'paragraph'
-    print(block_to_block_type("1. First\n2. Second"))  # should return 'ordered_list'
-    print(block_to_block_type("1. First\n3. Third"))  # should return 'paragraph' (missing 2)
-
+    # Generate pages recursively
+    generate_pages_recursive(
+        "content",       # directory containing markdown files
+        "template.html", # template file path
+        "public"        # output directory
+    )
 
 if __name__ == "__main__":
     main()

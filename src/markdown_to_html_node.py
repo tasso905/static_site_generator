@@ -28,7 +28,8 @@ def markdown_to_html_node(markdown):
         elif det == "code":
             # Remove the triple backticks from start and end
             code_text = block[3:-3].strip()
-            code_node = HTMLNode("code", children=[HTMLNode(None, text=code_text)])
+            code_node = HTMLNode("code", children=[HTMLNode(None, value=code_text)])
+            #code_node = HTMLNode("code", children=[HTMLNode(None, text=code_text)])
             pre_node = HTMLNode("pre", children=[code_node])
             html_node_list.append(pre_node)
         elif det == "quote":
@@ -76,3 +77,10 @@ def markdown_to_html_node(markdown):
 
     parent_div = HTMLNode("div", children=html_node_list)
     return parent_div
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    for line in lines:
+        stripped_line = line.strip()
+        if stripped_line.startswith("#") and not stripped_line.startswith("##"):
+            return stripped_line[2:].strip()
+    raise Exception("No valid header found.")
