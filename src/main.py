@@ -13,7 +13,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         # Create full paths for source and destination
         src_path = os.path.join(dir_path_content, item)
         dest_path = os.path.join(dest_dir_path, item)
-
+        print(f"Found item: {src_path}")  # Add this debug line
         if os.path.isfile(src_path):
             if src_path.endswith(".md"):
                 with open(src_path, 'r') as file:
